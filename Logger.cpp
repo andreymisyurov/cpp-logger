@@ -4,7 +4,8 @@
 std::string Logger::getRelativePath(const std::string& fullPath) {
     // HAVE TO FIX TO UNUVERSAL PATH!
     // std::string basePath = std::filesystem::current_path().string();
-    std::string basePath = "/home/andrey/work/test/tg_video_toolbox/src/";
+    std::string basePath = "/Users/gonzo/program/nomad-log/build/";
+    // std::string basePath = "/home/andrey/work/test/tg_video_toolbox/src/";
     if (fullPath.find(basePath) == 0) {
         return fullPath.substr(basePath.length());
     }
