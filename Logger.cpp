@@ -1,29 +1,42 @@
 #include "Logger.h"
+
 #include <filesystem>
+#include <fstream>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 std::string Logger::getRelativePath(const std::string& fullPath) {
-    // HAVE TO FIX TO UNUVERSAL PATH!
-    // std::string basePath = std::filesystem::current_path().string();
-    std::string basePath = "/Users/gonzo/program/nomad-log/build/";
-    // std::string basePath = "/home/andrey/work/test/tg_video_toolbox/src/";
-    if (fullPath.find(basePath) == 0) {
-        return fullPath.substr(basePath.length());
+    if (!m_basePath.empty() && fullPath.find(m_basePath) == 0) {
+        return fullPath.substr(m_basePath.length());
     }
     return fullPath;
 }
 
 Logger::Logger() {
-    try {
-        auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-        auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("bot.log", true);
-        console_sink->set_pattern("[%Y-%m-%d %H:%M:%S] [%^%l%$] %v");
-        file_sink->set_pattern("[%Y-%m-%d %H:%M:%S] [%l] %v");
-
-        logger = std::make_shared<spdlog::logger>("bot_logger", spdlog::sinks_init_list{console_sink, file_sink});
-        logger->set_level(spdlog::level::debug);
-        logger->flush_on(spdlog::level::debug);
-        spdlog::register_logger(logger);
-    } catch (const spdlog::spdlog_ex& ex) {
-        std::cerr << "Logger initialization failed: " << ex.what() << std::endl;
+    std::ifstream configFile("cpp-logger/logger_config.json");
+    if (!configFile.is_open()) {
+        throw std::runtime_error("Logger config not found: cpp-logger/logger_config.json");
     }
+
+    json config;
+    configFile >> config;
+
+    std::string logDir = config["log_dir"];
+    std::string logFile = config["log_file"];
+    m_basePath = config["base_path"];
+
+    std::filesystem::create_directories(logDir);
+    std::string logPath = logDir + "/" + logFile;
+
+    auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logPath, true);
+    console_sink->set_pattern("[%Y-%m-%d %H:%M:%S] [%^%l%$] %v");
+    file_sink->set_pattern("[%Y-%m-%d %H:%M:%S] [%l] %v");
+
+    logger = std::make_shared<spdlog::logger>("app_logger",
+                                              spdlog::sinks_init_list{console_sink, file_sink});
+    logger->set_level(spdlog::level::debug);
+    logger->flush_on(spdlog::level::debug);
+    spdlog::register_logger(logger);
 }

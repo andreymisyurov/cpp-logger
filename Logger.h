@@ -1,21 +1,28 @@
 #ifndef LOGGER_H
 #define LOGGER_H
-#include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
+
+#include <iostream>
 #include <memory>
 #include <string>
-#include <iostream>
 
-#define LOG_INFO(msg, ...) Logger::getInstance().info("[{}:{} {}] {}", Logger::getRelativePath(__FILE__), __LINE__, __FUNCTION__, fmt::format(FMT_STRING(msg), ##__VA_ARGS__))
-#define LOG_DEBUG(msg, ...) Logger::getInstance().debug("[{}:{} {}] {}", Logger::getRelativePath(__FILE__), __LINE__, __FUNCTION__, fmt::format(FMT_STRING(msg), ##__VA_ARGS__))
-#define LOG_WARN(msg, ...) Logger::getInstance().warn("[{}:{} {}] {}", Logger::getRelativePath(__FILE__), __LINE__, __FUNCTION__, fmt::format(FMT_STRING(msg), ##__VA_ARGS__))
-#define LOG_ERROR(msg, ...) Logger::getInstance().error("[{}:{} {}] {}", Logger::getRelativePath(__FILE__), __LINE__, __FUNCTION__, fmt::format(FMT_STRING(msg), ##__VA_ARGS__))
-
-
+#define LOG_INFO(msg, ...)                                                                   \
+    Logger::getInstance().info("[{}:{} {}] {}", Logger::getRelativePath(__FILE__), __LINE__, \
+                               __FUNCTION__, fmt::format(FMT_STRING(msg), ##__VA_ARGS__))
+#define LOG_DEBUG(msg, ...)                                                                   \
+    Logger::getInstance().debug("[{}:{} {}] {}", Logger::getRelativePath(__FILE__), __LINE__, \
+                                __FUNCTION__, fmt::format(FMT_STRING(msg), ##__VA_ARGS__))
+#define LOG_WARN(msg, ...)                                                                   \
+    Logger::getInstance().warn("[{}:{} {}] {}", Logger::getRelativePath(__FILE__), __LINE__, \
+                               __FUNCTION__, fmt::format(FMT_STRING(msg), ##__VA_ARGS__))
+#define LOG_ERROR(msg, ...)                                                                   \
+    Logger::getInstance().error("[{}:{} {}] {}", Logger::getRelativePath(__FILE__), __LINE__, \
+                                __FUNCTION__, fmt::format(FMT_STRING(msg), ##__VA_ARGS__))
 
 class Logger {
-public:
+   public:
     static Logger& getInstance() {
         static Logger instance;
         return instance;
@@ -43,11 +50,12 @@ public:
 
     static std::string getRelativePath(const std::string& fullPath);
 
-private:
+   private:
     std::shared_ptr<spdlog::logger> logger;
+    static inline std::string m_basePath;
 
     Logger();
     ~Logger() = default;
 };
 
-#endif // LOGGER_H
+#endif  // LOGGER_H

@@ -1,0 +1,5 @@
+{
+    "log_dir": "logs",
+    "log_file": "server.log",
+    "base_path": "/Users/gonzo/program/nomad-log/"
+  }
