@@ -14,17 +14,19 @@ std::string Logger::getRelativePath(const std::string& fullPath) {
 }
 
 Logger::Logger() {
+    std::string logDir = "logs";
+    std::string logFile = "app.log";
+    m_basePath = "./";
+
     std::ifstream configFile("cpp-logger/logger_config.json");
-    if (!configFile.is_open()) {
-        throw std::runtime_error("Logger config not found: cpp-logger/logger_config.json");
+    if (configFile.is_open()) {
+        json config;
+        configFile >> config;
+
+        logDir = config["log_dir"];
+        logFile = config["log_file"];
+        m_basePath = config["base_path"];
     }
-
-    json config;
-    configFile >> config;
-
-    std::string logDir = config["log_dir"];
-    std::string logFile = config["log_file"];
-    m_basePath = config["base_path"];
 
     std::filesystem::create_directories(logDir);
     std::string logPath = logDir + "/" + logFile;
